@@ -10,7 +10,6 @@ def urlretrieve(url, fpath, headers=None):
     while True:
         data = urlfile.read(chunk)
         if not data:
-            print "done."
             break
         f.write(data)
     urlfile.close()

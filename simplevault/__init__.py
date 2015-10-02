@@ -1,4 +1,1 @@
-import os
-from uuid import uuid4
-
-
+from vault import SimpleVault

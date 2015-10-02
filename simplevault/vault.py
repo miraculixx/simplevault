@@ -75,7 +75,7 @@ class SimpleVault(object):
     def __init__(self, key=None, location=None, 
                  s3_bucket=None, s3_path=None,
                  s3_useragent=None):
-        self.key = key or os.environ.get('VAULT_KEY') or uuid4().hex
+        self.key = key or os.environ.get('S3_VAULT_KEY') or uuid4().hex
         self.s3_path = s3_path or os.environ.get('S3_VAULT_PATH')
         self.s3_bucket = s3_bucket or os.environ.get('S3_VAULT_BUCKET')
         self.s3_useragent = s3_useragent or os.environ.get('S3_VAULT_USERAGENT')
@@ -98,7 +98,7 @@ class SimpleVault(object):
         os.remove(vault_crypt)
         os.rmdir(vault_tmp)
         
-    def make(self, name=None, src=None, pattern=None, upload=True):
+    def make(self, name=None, src=None, include=None, upload=True):
         """
         Takes a directory, zips all files in it, encrypts the file
         and uploads it to the path (use s3://bucket/path). 
@@ -119,7 +119,7 @@ class SimpleVault(object):
         # create zip file
         self.zipfiles(src or self.location, vault_zip, 
                       exclude='.vault', 
-                      include=pattern)
+                      include=include)
         with open(vault_zip) as vz, open(vault_crypt, 'w') as vc:
             zipped = vz.read()
             aes = AESCipher(self.key)
@@ -140,6 +140,7 @@ class SimpleVault(object):
             assert self.s3_bucket, "No s3_bucket specified"
             assert self.s3_useragent, "you need to provide $S3_VAULT_USERAGENT"
             self.download(self.s3_bucket, self.s3_file(name), vault_crypt)
+            assert os.path.exists(vault_crypt), "Download failed for %s" % self.s3_file(name)
         with open(vault_zip, 'w') as vz, open(vault_crypt) as vc:
             c = vc.read()
             aes = AESCipher(self.key)
