@@ -11,7 +11,7 @@ setup(
     version='0.1',
     packages=find_packages(),
     include_package_data=True,
-    license='MIT',  
+    license='MIT',
     description='Simple file based vault system - store and deploy secrets, secured.',
     long_description=README,
     author='miraculixx',
@@ -20,11 +20,11 @@ setup(
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
-        'License :: Commercial', # example license
+        'License :: Commercial',  # example license
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         # replace these appropriately if you are using Python 3 
-        'Programming Language :: Python :: 2', 
+        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
@@ -32,7 +32,14 @@ setup(
     install_requires=[
         'pyaes==1.3.0',
         'tinys3==0.1.11',
-    ], 
+    ],
     dependency_links=[
-    ]
+    ],
+    entry_points={
+      'console_scripts': [
+        'mkvault = simplevault.cli:console_mkvault',
+        'unvault = simplevault.cli:console_unvault',
+        'simplevault = simplevault.cli:console_simplevault',
+    ],
+}
 )
