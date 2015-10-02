@@ -1,12 +1,13 @@
 import os
 import shutil
 from uuid import uuid4
-from zipfile import ZipFile
+from zipfile import ZipFile, BadZipfile
 
 import tinys3
 
 from simplevault.aes import AESCipher
 from simplevault.util import urlretrieve
+
 
 AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY_ID') 
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
@@ -146,8 +147,12 @@ class SimpleVault(object):
             aes = AESCipher(self.key)
             plain = aes.decrypt(c)
             vz.write(plain)
-        zipf = ZipFile(vault_zip)
-        zipf.extractall(target or self.location)
+        try:
+            zipf = ZipFile(vault_zip)
+            zipf.extractall(target or self.location)
+        except BadZipFile as e:
+            raise BadZipFile('Could not extract %s. Did you set the key?' % vault_crypt)
+            
         members = [os.path.join(self.location, member) 
                    for member in zipf.namelist()]
         self.extracted_files.extend(members)
