@@ -1,4 +1,6 @@
-Simple file based vault system - store and deploy secrets, secured.
+Simple file based vault system 
+-------------------------------
+store and deploy secrets, secured.
     
 With a 12-factor system where local storage is not persistent, there are
 no simple solutions to storing secrets, in particular if those secrets
@@ -20,6 +22,7 @@ Features:
 
 Usage:
 
+```
 # local use
 vault = SimpleVault(location='/path/to/vault')  
 crypt = vault.make('myvault', '/path/to/source', upload=False)
@@ -30,6 +33,7 @@ files = vault.unvault('myvault', '/path/to/target', download=False)
 $ export AWS_ACCESS_KEY_ID=
 $ export AWS_SECRET_ACCESS_KEY=
 $ export AWS_ENDPOINT=
+
 # -- SimpleVault settings
 $ export S3_VAULT_KEY=key to use for encryption/decryption
 $ export S3_VAULT_BUCKET=bucket name
@@ -55,3 +59,4 @@ $ export S3_VAULT_USERAGENT=user agent set on S3 policy
         }
     },
 }    
+```
