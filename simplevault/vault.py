@@ -76,7 +76,7 @@ class SimpleVault(object):
     def __init__(self, key=None, location=None, 
                  s3_bucket=None, s3_path=None,
                  s3_useragent=None):
-        self.key = key or os.environ.get('S3_VAULT_KEY') or uuid4().hex
+        self.key = key or os.environ.get('S3_VAULT_KEY') or self.secret_key()
         self.s3_path = s3_path or os.environ.get('S3_VAULT_PATH')
         self.s3_bucket = s3_bucket or os.environ.get('S3_VAULT_BUCKET')
         self.s3_useragent = s3_useragent or os.environ.get('S3_VAULT_USERAGENT')
@@ -198,3 +198,6 @@ class SimpleVault(object):
         for member in self.extracted_files:
             os.remove(member)
         shutil.rmtree(vault_tmp)
+        
+    def secret_key(self, bytes=16):
+        return os.urandom(16).encode('hex')

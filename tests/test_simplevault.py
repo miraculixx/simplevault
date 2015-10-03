@@ -4,6 +4,7 @@ from unittest.case import TestCase
 from uuid import uuid4
 
 from simplevault.vault import SimpleVault
+from zipfile import BadZipfile
 
 
 VAULT_PATH='/tmp/simplevault'
@@ -149,3 +150,26 @@ class SimpleVaultTests(TestCase):
         self.assertTrue(os.path.exists(secret_file2))
         with open(secret_file2) as f:
             self.assertEqual(plain, f.read())
+            
+    def test_make_unvault_invalidkey(self):
+        # create a vault with one file
+        plain = "This is a secret"
+        key = uuid4().hex
+        vault = SimpleVault(key, location=VAULT_PATH)
+        secret_file = '%s/secret.txt' % VAULT_PATH
+        with open(secret_file, 'w') as f:
+            f.write(plain)
+        crypt = vault.make('test', VAULT_PATH, upload=False)
+        self.assertTrue(os.path.exists(os.path.join(VAULT_PATH, '.vault')))
+        self.assertTrue(os.path.exists(crypt))
+        # make sure we have an encrypted file
+        with open(crypt) as f:
+            self.assertNotEqual(f.read(), plain)
+        # see if we can unvault with the **wrong key**
+        # for simplicity we simply reverse the key string
+        vault = SimpleVault(key[-1:], location=VAULT_PATH)
+        os.remove(secret_file)
+        with self.assertRaises(BadZipfile):
+            files = vault.unvault('test', download=False)
+        self.assertFalse(os.path.exists(secret_file))
+        
