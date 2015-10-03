@@ -75,8 +75,8 @@ $ export AWS_ENDPOINT=
 ```
 
 On your deployed server instance (where you want the
-vault files to be extract), all you need is the S3_VAULT_USER_AGENT, all
-other parameters can be passed on the command line. 
+vault files to be extract), all you need are S3_VAULT_USER_AGENT and S3_VAULT_KEY. 
+All other parameters are passed on the command line. 
 
 ```
 # -- SimpleVault settings
