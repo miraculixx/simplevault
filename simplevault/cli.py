@@ -83,7 +83,7 @@ def main(*realargs):
         from simplevault import SimpleVault
         vault = SimpleVault(s3_bucket=args.s3bucket, s3_path=args.path,
                             location=args.location, key=args.key)
-        files = vault.unvault(args.name, target=args.path, 
+        files = vault.unvault(args.name, target=args.location or args.path, 
                               download=not args.noremote)
         print "Extracted %s" % files
     else:

@@ -152,8 +152,7 @@ class SimpleVault(object):
             zipf.extractall(target or self.location)
         except BadZipfile as e:
             raise BadZipfile('Could not extract %s. Did you set the key?' % vault_crypt)
-            
-        members = [os.path.join(self.location, member) 
+        members = [os.path.join(target or self.location, member) 
                    for member in zipf.namelist()]
         self.extracted_files.extend(members)
         self.cleanup(name)
