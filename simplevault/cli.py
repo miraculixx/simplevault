@@ -2,7 +2,7 @@ import argparse
 import sys
 
 
-def makevault(site=None, location='~/.shrebo', s3bucket='shrebo', s3path='vault', 
+def makevault(site=None, location='~/.vault', s3bucket='', s3path='vault', 
               files=None, key=None):
     from simplevault import SimpleVault
     vault = SimpleVault(s3_bucket=s3bucket, s3_path=s3path,
@@ -11,7 +11,7 @@ def makevault(site=None, location='~/.shrebo', s3bucket='shrebo', s3path='vault'
     print "Ok, created %s and uploaded to s3://%s/%s" % (crypt, s3bucket, s3path)
     print "export S3_VAULT_KEY=%s" % vault.key
     
-def unvault(site=None, location='~/.shrebo', s3bucket='shrebo', s3path='vault', 
+def unvault(site=None, location='~/.vault', s3bucket='', s3path='vault', 
             files=None, key=None):
     from simplevault import SimpleVault
     vault = SimpleVault(s3_bucket=s3bucket, s3_path=s3path,
@@ -23,22 +23,22 @@ def console_mkvault():
     if not len(sys.argv) == 4:
         print "mkvault name location bucket/path"
         exit(1)
-    path = sys.argv[3].split('/')
+    bucket, path = sys.argv[3].split('/', 1)
     main('--write',
          '--name=%s' % sys.argv[1], 
          '--location=%s' % sys.argv[2],
-         '--s3bucket=%s' % path[0],
-         '--path=%s' % path[1])
+         '--s3bucket=%s' % bucket,
+         '--path=%s' % path)
     
 def console_unvault():
     if not len(sys.argv) == 4:
         print "unvault name bucket/path location"
         exit(1)
-    path = sys.argv[2].split('/')
+    bucket, path = sys.argv[2].split('/', 1)
     main('--extract',
          '--name=%s' % sys.argv[1],
-         '--s3bucket=%s' % path[0], 
-         '--path=%s' % path[1],
+         '--s3bucket=%s' % bucket, 
+         '--path=%s' % path,
          '--location=%s' % sys.argv[3],)
     
 def console_simplevault():
