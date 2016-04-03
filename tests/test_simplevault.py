@@ -7,20 +7,22 @@ from simplevault.vault import SimpleVault
 from zipfile import BadZipfile
 
 
-VAULT_PATH='/tmp/simplevault'
+VAULT_PATH = '/tmp/simplevault'
 VAULT_PATH2 = '%sOther' % VAULT_PATH
-        
+
 S3_VAULT_BUCKET = os.environ.get('TEST_S3_VAULT_BUCKET')
-S3_VAULT_USERAGENT=os.environ.get('TEST_S3_VAULT_USERAGENT')
+S3_VAULT_USERAGENT = os.environ.get('TEST_S3_VAULT_USERAGENT')
 S3_VAULT_PATH = 'vault'
 
+
 class SimpleVaultTests(TestCase):
+
     def setUp(self):
         TestCase.setUp(self)
-        
+
     def tearDown(self):
         call(('rm -rf %s' % VAULT_PATH).split(' '))
-        
+
     def test_make_unvault(self):
         # create a vault with one file
         plain = "This is a secret"
@@ -42,7 +44,7 @@ class SimpleVaultTests(TestCase):
         self.assertTrue(os.path.exists(secret_file))
         with open(secret_file) as f:
             self.assertEqual(plain, f.read())
-            
+
     def test_make_unvault_complex(self):
         # create a vault with one file
         plain = "This is a secret"
@@ -67,15 +69,15 @@ class SimpleVaultTests(TestCase):
             self.assertTrue(os.path.exists(fn))
             with open(fn) as f:
                 self.assertEqual(plain, f.read())
-    
+
     def test_make_unvault_s3(self):
-        assert S3_VAULT_BUCKET, "export TEST_S3_VAULT_BUCKET=<your bucket>" 
+        assert S3_VAULT_BUCKET, "export TEST_S3_VAULT_BUCKET=<your bucket>"
         assert S3_VAULT_USERAGENT, "export TEST_S3_VAULT_USERAGENT=<your useragent>"
         # create a vault with one file
         plain = "This is a secret"
         key = uuid4().hex
         vault = SimpleVault(key, location=VAULT_PATH,
-                            s3_bucket=S3_VAULT_BUCKET, 
+                            s3_bucket=S3_VAULT_BUCKET,
                             s3_path=S3_VAULT_PATH,
                             s3_useragent=S3_VAULT_USERAGENT)
         secret_file = '%s/secret.txt' % VAULT_PATH
@@ -95,7 +97,7 @@ class SimpleVaultTests(TestCase):
         self.assertTrue(os.path.exists(secret_file))
         with open(secret_file) as f:
             self.assertEqual(plain, f.read())
-            
+
     def test_make_unvault_different_path(self):
         # create a vault with one file
         plain = "This is a secret"
@@ -114,19 +116,20 @@ class SimpleVaultTests(TestCase):
         # see if we can unvault
         os.remove(secret_file)
         files = vault.unvault('test', target=VAULT_PATH2, download=False)
-        self.assertIn(secret_file, files)
+        self.assertIn(os.path.basename(secret_file),
+                      [os.path.basename(f) for f in files])
         self.assertTrue(os.path.exists(secret_file2))
         with open(secret_file2) as f:
             self.assertEqual(plain, f.read())
-            
+
     def test_make_unvault_different_path_s3(self):
-        assert S3_VAULT_BUCKET, "export TEST_S3_VAULT_BUCKET=<your bucket>" 
+        assert S3_VAULT_BUCKET, "export TEST_S3_VAULT_BUCKET=<your bucket>"
         assert S3_VAULT_USERAGENT, "export TEST_S3_VAULT_USERAGENT=<your useragent>"
         # create a vault with one file
         plain = "This is a secret"
         key = uuid4().hex
         vault = SimpleVault(key, location=VAULT_PATH,
-                            s3_bucket=S3_VAULT_BUCKET, 
+                            s3_bucket=S3_VAULT_BUCKET,
                             s3_path=S3_VAULT_PATH,
                             s3_useragent=S3_VAULT_USERAGENT)
         secret_file = '%s/secret.txt' % VAULT_PATH
@@ -142,7 +145,7 @@ class SimpleVaultTests(TestCase):
         # see if we can unvault into another local path
         os.remove(secret_file)
         vault = SimpleVault(key, location=VAULT_PATH2,
-                            s3_bucket=S3_VAULT_BUCKET, 
+                            s3_bucket=S3_VAULT_BUCKET,
                             s3_path=S3_VAULT_PATH,
                             s3_useragent=S3_VAULT_USERAGENT)
         files = vault.unvault('test', target=VAULT_PATH2, download=True)
@@ -150,7 +153,7 @@ class SimpleVaultTests(TestCase):
         self.assertTrue(os.path.exists(secret_file2))
         with open(secret_file2) as f:
             self.assertEqual(plain, f.read())
-            
+
     def test_make_unvault_invalidkey(self):
         # create a vault with one file
         plain = "This is a secret"
@@ -172,4 +175,3 @@ class SimpleVaultTests(TestCase):
         with self.assertRaises(BadZipfile):
             files = vault.unvault('test', download=False)
         self.assertFalse(os.path.exists(secret_file))
-        

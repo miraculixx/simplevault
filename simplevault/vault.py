@@ -80,7 +80,7 @@ class SimpleVault(object):
         self.s3_path = s3_path or os.environ.get('S3_VAULT_PATH')
         self.s3_bucket = s3_bucket or os.environ.get('S3_VAULT_BUCKET')
         self.s3_useragent = s3_useragent or os.environ.get('S3_VAULT_USERAGENT')
-        self.location = location
+        self.location = location or os.environ.get('S3_VAULT_LOCATION')
         self.extracted_files = []
         os.makedirs(location) if not os.path.exists(location) else None
         
@@ -107,7 +107,7 @@ class SimpleVault(object):
         If not provided the key is randomly generated and output as a result. 
         Use this key to decrypt the file.
         
-        Uses $SHREBO_VAULTKEY if available.
+        Uses $S3_VAULT_KEY if available.
         """
         assert self.key, "you have to give a key or set in S3_VAULT_KEY"
         assert name, "give a vault name"
@@ -152,8 +152,7 @@ class SimpleVault(object):
             zipf.extractall(target or self.location)
         except BadZipfile as e:
             raise BadZipfile('Could not extract %s. Did you set the key?' % vault_crypt)
-            
-        members = [os.path.join(self.location, member) 
+        members = [os.path.join(target or self.location, member) 
                    for member in zipf.namelist()]
         self.extracted_files.extend(members)
         self.cleanup(name)
