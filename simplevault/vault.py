@@ -166,7 +166,7 @@ class SimpleVault(object):
                         AWS_SECRET_ACCESS_KEY,
                         tls=True, endpoint=AWS_ENDPOINT)
         with open(source) as f:
-            connection.upload(path, f, bucket=bucket)
+            connection.upload(path, f, bucket=bucket, public=False)
          
     def download(self, bucket, path, localfile):
         s3_url = "https://%s/%s/%s" % (AWS_ENDPOINT, bucket, path)
